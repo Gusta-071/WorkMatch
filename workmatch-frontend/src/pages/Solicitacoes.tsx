@@ -395,7 +395,7 @@ function CardOrcamento({ orc, onAceitar, onRecusar, onContrapropor }: CardOrcame
       <div style={co.linha}>
         <div>
           <span style={co.nome}>{orc.prestador?.nome}</span>
-          <span style={co.reputacao}> - Avaliação: {orc.prestador?.reputacaoPrestador.toFixed(1)}</span>
+          <span style={co.reputacao}> - Avaliação: {orc.prestador?.reputacaoPrestador?.toFixed(1) ?? '—'}</span>
         </div>
         <div style={co.direita}>
           <span style={{ ...co.badge, backgroundColor: corStatus[orc.status] + '22', color: corStatus[orc.status] }}>
@@ -803,10 +803,6 @@ export default function Solicitacoes({ usuarioId }: SolicitacoesProps) {
   const colecaoHistorico = useMemo(() => {
     return demandas.filter(d => ['CONCLUIDA', 'EXCLUIDA'].includes(d.status));
   }, [demandas]);
-
-  const aprovadas = useMemo(() => colecaoAndamento.filter(d => d.status === 'APROVADA'), [colecaoAndamento]);
-  const ativas = useMemo(() => colecaoAndamento.filter(d => ['ABERTA', 'NEGOCIACAO'].includes(d.status)), [colecaoAndamento]);
-  const desativadas = useMemo(() => colecaoAndamento.filter(d => d.status === 'DESABILITADA'), [colecaoAndamento]);
 
   useSubpainelSidebar(
     <SubAbasPainel

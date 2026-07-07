@@ -5,7 +5,7 @@
  * sidebar, sem que a Sidebar precise conhecer os detalhes de cada página.
  */
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, type ReactNode } from 'react';
 
 interface SubpainelContextValue {
   definirSubpainel: (conteudo: ReactNode | null) => void;
