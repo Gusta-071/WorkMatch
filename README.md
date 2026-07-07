@@ -1,36 +1,45 @@
 WORKMATCH
 
-Marketplace de freelancers que conecta clientes (contratantes) a prestadores de servico, com negociacao de orcamento, controle de ciclo de vida da demanda e sistema de reputacao. Projeto desenvolvido para a disciplina de Programacao Orientada a Objetos (POO).
+Marketplace de freelancers que conecta clientes (contratantes) a prestadores de serviço, com negociação de orçamento, controle de ciclo de vida da demanda e sistema de reputação. Projeto desenvolvido para a disciplina de Programação Orientada a Objetos (POO).
 
+Aplicação no ar: https://workmatch-test.vercel.app
+API (backend): https://workmatch-9hvx.onrender.com
 
 STACK
 
-Backend - workmatch-backend/
-- TypeScript (Node.js, type: module)
-- Express 5
-- Prisma ORM 7 + adapter @prisma/adapter-libsql sobre SQLite
-- bcryptjs (hash de senha), cors, dotenv
-- Execucao via tsx
+Backend — workmatch-backend/
 
-Frontend - workmatch-frontend/
-- React 19 + TypeScript
-- Vite 8
-- React Router DOM 7
-- Axios
-- oxlint (lint)
+TypeScript (Node.js, type: module)
+Express 5
+Prisma ORM 7 + adapter @prisma/adapter-libsql sobre SQLite/libSQL
+bcryptjs (hash de senha), cors, dotenv
+Execução via tsx
 
+Frontend — workmatch-frontend/
+
+React 19 + TypeScript
+Vite 8
+React Router DOM 7
+Axios
+oxlint (lint)
+
+Infraestrutura (produção)
+
+Turso (libSQL) — banco de dados SQLite distribuído na nuvem
+Render — hospedagem do backend (Web Service)
+Vercel — hospedagem do frontend (build estático)
 
 ARQUITETURA
 
-O backend segue uma separacao classica em camadas:
+O backend segue uma separação clássica em camadas.
 
 workmatch-backend/src/
-  domain/          Entidades e regras de negocio (POO puro, sem dependencia do Prisma)
+  domain/          Entidades e regras de negócio (POO puro, sem dependência do Prisma)
     Usuario.ts
     Demanda.ts
     Orcamento.ts
     NivelExperiencia.ts
-  repositories/    Padrao Repository: converte entre entidades de dominio e o banco (Prisma)
+  repositories/    Padrão Repository: converte entre entidades de domínio e o banco (Prisma)
     UsuarioRepository.ts
     DemandaRepository.ts
     OrcamentoRepository.ts
@@ -39,23 +48,21 @@ workmatch-backend/src/
     prisma.ts
   server.ts        Endpoints da API
 
-As classes de dominio (Usuario, Demanda, Orcamento) encapsulam seu estado com propriedades privadas e getters, expondo apenas metodos de negocio (ex: aprovarOrcamento, avaliarPrestador, contrapropor). Cada uma tem um factory method estatico reconstituir(...) usado pelos repositorios para reidratar objetos vindos do banco sem repetir as validacoes do construtor.
+As classes de domínio (Usuario, Demanda, Orcamento) encapsulam seu estado com propriedades privadas e getters, expondo apenas métodos de negócio (ex: aprovarOrcamento, avaliarPrestador, contrapropor). Cada uma tem um factory method estático reconstituir(...) usado pelos repositórios para reidratar objetos vindos do banco sem repetir as validações do construtor.
 
-O frontend usa um layout com sidebar e um SubpainelContext para injetar subpaineis contextuais por pagina (Explorar, Solicitacoes, Servicos, Perfil).
-
+O frontend usa um layout com sidebar e um SubpainelContext para injetar subpainéis contextuais por página (Explorar, Solicitações, Serviços, Perfil).
 
 MODELO DE DADOS
 
-Usuario - cliente e/ou prestador. Mantem reputacao separada como cliente e como prestador (reputacaoCliente, reputacaoPrestador), competencias (Competencia) e total de servicos concluidos.
+Usuario — cliente e/ou prestador. Mantém reputação separada como cliente e como prestador (reputacaoCliente, reputacaoPrestador), competências (Competencia) e total de serviços concluídos.
 
-Categoria / Habilidade - catalogo de categorias de servico e habilidades vinculadas.
+Categoria / Habilidade — catálogo de categorias de serviço e habilidades vinculadas.
 
-Demanda - solicitacao de servico criada por um contratante, com categoria, valor estimado, prazo, nivel minimo exigido e reputacao minima exigida.
+Demanda — solicitação de serviço criada por um contratante, com categoria, valor estimado, prazo, nível mínimo exigido e reputação mínima exigida.
 
-Orcamento - proposta de valor de um prestador para uma demanda, com historico de negociacao.
+Orcamento — proposta de valor de um prestador para uma demanda, com histórico de negociação.
 
-
-REGRAS DE NEGOCIO
+REGRAS DE NEGÓCIO
 
 Ciclo de vida da Demanda:
 
@@ -63,60 +70,87 @@ ABERTA -> NEGOCIACAO -> APROVADA -> CONCLUIDA
 ABERTA/NEGOCIACAO -> DESABILITADA -> (reativar) -> ABERTA
 ABERTA/DESABILITADA -> EXCLUIDA
 
-- Uma demanda so pode ser desabilitada ou excluida antes de ser aprovada.
-- Ao aprovar um orcamento, a demanda define o prestador escolhido e o valorFinalAcordado.
-- Apos a entrega do prestador, cliente e prestador se avaliam mutuamente (nota de 0 a 5); a demanda so e marcada como CONCLUIDA quando ambas as avaliacoes existem.
-- Avaliacao automatica: se uma das partes nao avaliar em ate 3 dias apos a entrega do prestador, o sistema aplica nota maxima (5) automaticamente para destravar a conclusao.
+Uma demanda só pode ser desabilitada ou excluída antes de ser aprovada.
+Ao aprovar um orçamento, a demanda define o prestador escolhido e o valorFinalAcordado.
+Após a entrega do prestador, cliente e prestador se avaliam mutuamente (nota de 0 a 5); a demanda só é marcada como CONCLUÍDA quando ambas as avaliações existem.
+Avaliação automática: se uma das partes não avaliar em até 3 dias após a entrega do prestador, o sistema aplica nota máxima (5) automaticamente para destravar a conclusão.
 
-Taxa por nivel de experiencia:
+Taxa por nível de experiência:
 
-O valor estimado de uma demanda recebe uma taxa conforme o nivel minimo exigido definido pelo contratante (nao o nivel real do prestador que aceitar):
+O valor estimado de uma demanda recebe uma taxa conforme o nível mínimo exigido definido pelo contratante (não o nível real do prestador que aceitar):
 
-  Iniciante      0%
-  Intermediario  5%
-  Avancado       10%
-  Especialista   20%
+Nível ......... Taxa
+Iniciante ...... 0%
+Intermediário .. 5%
+Avançado ....... 10%
+Especialista ... 20%
 
-O nivel de experiencia de um prestador e calculado automaticamente pelo total de servicos concluidos (Iniciante ate 5, Intermediario ate 15, Avancado ate 30, Especialista acima disso).
+O nível de experiência de um prestador é calculado automaticamente pelo total de serviços concluídos (Iniciante até 5, Intermediário até 15, Avançado até 30, Especialista acima disso).
 
-Orcamento (negociacao "ping-pong"):
+Orçamento (negociação "ping-pong"):
 
-- Status possiveis: PENDENTE, ACEITO, RECUSADO, EXCLUIDO.
-- Uma contraproposta so pode ser feita pela parte que NAO fez a ultima proposta (ultimaPropostaPor alterna entre PRESTADOR e CLIENTE), evitando que alguem sobrescreva a propria oferta.
-- Um orcamento recusado pode ser reaberto com um novo valor, voltando a PENDENTE.
-- Um orcamento so pode ser excluido definitivamente depois de recusado.
+Status possíveis: PENDENTE, ACEITO, RECUSADO, EXCLUIDO.
+Uma contraproposta só pode ser feita pela parte que NÃO fez a última proposta (ultimaPropostaPor alterna entre PRESTADOR e CLIENTE), evitando que alguém sobrescreva a própria oferta.
+Um orçamento recusado pode ser reaberto com um novo valor, voltando a PENDENTE.
+Um orçamento só pode ser excluído definitivamente depois de recusado.
 
+DEPLOY (PRODUÇÃO)
 
-COMO RODAR
+A aplicação está publicada e acessível publicamente:
+
+Camada ........... Serviço ............ URL
+Frontend .......... Vercel ............. https://workmatch-test.vercel.app
+Backend ........... Render ............. https://workmatch-9hvx.onrender.com
+Banco de dados .... Turso (libSQL) ..... —
+
+Observação: o backend está no plano gratuito do Render, que hiberna após 15 minutos sem receber requisições. A primeira requisição depois de um período ocioso pode levar até ~1 minuto para responder enquanto o serviço "acorda"; as seguintes voltam ao normal. O banco (Turso) e o frontend (Vercel) não hibernam.
+
+Variáveis de ambiente do backend (produção)
+
+Configuradas diretamente no painel do Render (não versionadas no repositório):
+
+TURSO_DATABASE_URL=<url do banco no Turso>
+TURSO_AUTH_TOKEN=<token de autenticação do Turso>
+FRONTEND_URL=https://workmatch-test.vercel.app
+
+Variável de ambiente do frontend (produção)
+
+Configurada no painel da Vercel:
+
+VITE_API_URL=https://workmatch-9hvx.onrender.com
+
+COMO RODAR LOCALMENTE
 
 Backend:
 
-  cd workmatch-backend
-  npm install
-  npx prisma migrate dev     (cria/atualiza o banco SQLite)
-  npm run start              (tsx src/server.ts)
+cd workmatch-backend
+npm install
+npx prisma migrate dev     (cria/atualiza o banco SQLite local)
+npm run start              (tsx src/server.ts)
 
-Configure o .env com a string de conexao do SQLite, por exemplo:
+Configure o .env com a string de conexão do SQLite local, por exemplo:
 
-  DATABASE_URL="file:./prisma/dev.db"
+DATABASE_URL="file:./prisma/dev.db"
+
+(As variáveis TURSO_DATABASE_URL e TURSO_AUTH_TOKEN são opcionais em desenvolvimento — se não estiverem definidas, a aplicação usa o SQLite local via DATABASE_URL normalmente.)
 
 Frontend:
 
-  cd workmatch-frontend
-  npm install
-  npm run dev       (essencial: sobe o ambiente de desenvolvimento Vite com hot-reload)
+cd workmatch-frontend
+npm install
+npm run dev       (essencial: sobe o ambiente de desenvolvimento Vite com hot-reload)
 
-Outros scripts disponiveis, nao essenciais para o uso diario:
-- npm run build - gera a versao de producao (tsc -b + build do Vite) em dist/, usado apenas se for hospedar/publicar o projeto.
-- npm run lint - roda o oxlint para checar mas praticas e codigo morto no TS/React.
+Outros scripts disponíveis, não essenciais para o uso diário:
 
-Obs: o projeto foi criado a partir do template padrao Vite + React + TS. Se quiser lint com verificacao de tipos, e possivel habilitar regras type-aware do oxlint instalando oxlint-tsgolint e ajustando .oxlintrc.json (ver documentacao do Oxlint em oxc.rs).
+npm run build — gera a versão de produção (tsc -b + build do Vite) em dist/, usado apenas se for hospedar/publicar o projeto.
+npm run lint — roda o oxlint para checar más práticas e código morto no TS/React.
 
+Obs: o projeto foi criado a partir do template padrão Vite + React + TS. Se quiser lint com verificação de tipos, é possível habilitar regras type-aware do oxlint instalando oxlint-tsgolint e ajustando .oxlintrc.json (ver documentação do Oxlint em oxc.rs).
 
-ESTRUTURA DE PAGINAS (FRONTEND)
+ESTRUTURA DE PÁGINAS (FRONTEND)
 
-- Login - cadastro/login de usuarios.
-- Explorar - busca/filtra demandas disponiveis no marketplace.
-- Solicitacoes - demandas e orcamentos em negociacao.
-- Servicos - demandas aprovadas/concluidas, do ponto de vista de contratante ou prestador.
-- Perfil - dados do usuario, competencias e reputacao.
+Login — cadastro/login de usuários.
+Explorar — busca/filtra demandas disponíveis no marketplace.
+Solicitações — demandas e orçamentos em negociação.
+Serviços — demandas aprovadas/concluídas, do ponto de vista de contratante ou prestador.
+Perfil — dados do usuário, competências e reputação.
