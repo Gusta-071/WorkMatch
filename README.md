@@ -153,4 +153,8 @@ Login — cadastro/login de usuários.
 Explorar — busca/filtra demandas disponíveis no marketplace.
 Solicitações — demandas e orçamentos em negociação.
 Serviços — demandas aprovadas/concluídas, do ponto de vista de contratante ou prestador.
+<<<<<<< HEAD
 Perfil — dados do usuário, competências e reputação.
+=======
+Perfil — dados do usuário, competências e reputação.
+>>>>>>> 7e81d693549b9a02bc6443fe868b68e89c64560f
