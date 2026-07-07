@@ -47,13 +47,13 @@ export default function Sidebar({ abaAtiva, onSelecionarAba, subpainel, nomeUsua
   }, [subpainel, abaAtiva]);
 
   return (
-    <aside style={styles.sidebar}>
-      <div style={styles.topo}>
+    <aside style={styles.sidebar} className="wm-sidebar">
+      <div style={styles.topo} className="wm-sidebar-topo">
         <span style={styles.logo}>WorkMatch</span>
-        {nomeUsuario && <span style={styles.usuario}>{nomeUsuario}</span>}
+        {nomeUsuario && <span style={styles.usuario} className="wm-sidebar-usuario">{nomeUsuario}</span>}
       </div>
 
-      <nav style={styles.nav}>
+      <nav style={styles.nav} className="wm-sidebar-nav">
         {ITENS.map(item => {
           // Define se a gaveta deste item deve estar aberta.
           const estaAberto = abaAtiva === item.id && !!subpainel;
@@ -67,6 +67,7 @@ export default function Sidebar({ abaAtiva, onSelecionarAba, subpainel, nomeUsua
             <div key={item.id}>
               <button
                 onClick={() => onSelecionarAba(item.id)}
+                className="wm-sidebar-item"
                 style={{
                   ...styles.itemBotao,
                   ...(abaAtiva === item.id ? styles.itemAtivo : {}),
@@ -77,15 +78,18 @@ export default function Sidebar({ abaAtiva, onSelecionarAba, subpainel, nomeUsua
               </button>
 
               {/* Gaveta do subpainel: permanece no DOM e anima altura/opacidade */}
-              <div style={{
-                ...styles.subpainelGaveta,
-                maxHeight: estaAberto ? '1000px' : '0px',
-                opacity: estaAberto ? 1 : 0,
-                marginTop: estaAberto ? '6px' : '0px',
-                marginBottom: estaAberto ? '10px' : '0px',
-                paddingLeft: estaAberto ? '12px' : '0px',
-                pointerEvents: estaAberto ? 'auto' : 'none',
-              }}>
+              <div
+                className="wm-subpainel-gaveta"
+                style={{
+                  ...styles.subpainelGaveta,
+                  maxHeight: estaAberto ? '1000px' : '0px',
+                  opacity: estaAberto ? 1 : 0,
+                  marginTop: estaAberto ? '6px' : '0px',
+                  marginBottom: estaAberto ? '10px' : '0px',
+                  paddingLeft: estaAberto ? '12px' : '0px',
+                  pointerEvents: estaAberto ? 'auto' : 'none',
+                }}
+              >
                 {conteudoExibir}
               </div>
             </div>
@@ -95,6 +99,7 @@ export default function Sidebar({ abaAtiva, onSelecionarAba, subpainel, nomeUsua
 
       <button
         style={styles.sair}
+        className="wm-sidebar-sair"
         onClick={() => {
           localStorage.removeItem('@WorkMatch:user');
           window.location.href = '/';

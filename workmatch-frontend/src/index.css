@@ -121,3 +121,56 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* ─── Responsivo (mobile) ────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .wm-container {
+    flex-direction: column;
+  }
+
+  .wm-sidebar {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex-direction: row !important;
+    align-items: center;
+    overflow-x: auto;
+    padding: 10px 12px !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .wm-sidebar-topo {
+    margin-bottom: 0 !important;
+    padding-left: 0 !important;
+    flex-shrink: 0;
+  }
+
+  .wm-sidebar-usuario {
+    display: none; /* economiza espaço na barra horizontal */
+  }
+
+  .wm-sidebar-nav {
+    flex-direction: row !important;
+    gap: 2px !important;
+    flex-grow: 0 !important;
+  }
+
+  .wm-sidebar-item {
+    white-space: nowrap;
+    padding: 8px 10px !important;
+    font-size: 13px !important;
+  }
+
+  .wm-subpainel-gaveta {
+    display: none !important; /* subpainel expandido não cabe numa barra horizontal */
+  }
+
+  .wm-sidebar-sair {
+    display: none; /* opcional: sem espaço sobrando na barra */
+  }
+
+  .wm-conteudo {
+    padding: 16px !important;
+  }
+}

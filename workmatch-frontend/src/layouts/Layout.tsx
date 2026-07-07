@@ -26,7 +26,7 @@ export default function Layout() {
   const usuario = usuarioSalvo ? JSON.parse(usuarioSalvo) : null;
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} className="wm-container">
       <SubpainelProvider onMudar={setSubpainel}>
         <Sidebar
           abaAtiva={abaAtiva}
@@ -34,7 +34,7 @@ export default function Layout() {
           subpainel={subpainel}
           nomeUsuario={usuario?.nome}
         />
-        <main style={styles.conteudo}>
+        <main style={styles.conteudo} className="wm-conteudo">
           {abaAtiva === 'explorar' && <Explorar usuarioId={usuario?.id} />}
           {abaAtiva === 'solicitacoes' && <Solicitacoes usuarioId={usuario?.id} />}
           {abaAtiva === 'servicos' && <Servicos usuarioId={usuario?.id} />}
