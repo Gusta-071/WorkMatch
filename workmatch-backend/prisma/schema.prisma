@@ -1,0 +1,116 @@
+// Schema do banco de dados (Prisma) da aplicação WorkMatch.
+// Define os modelos de domínio (Usuario, Demanda, Orcamento, Categoria,
+// Habilidade e Competencia) e seus relacionamentos.
+
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+// Usuário do sistema, atuando como cliente (contratante) e/ou prestador de serviços.
+model Usuario {
+  id                       String        @id
+  nome                     String
+  email                    String        @unique
+  senha                    String
+  reputacaoPrestador       Float         @default(5.0)
+  totalAvaliacoesPrestador Int           @default(1)
+  reputacaoCliente         Float         @default(5.0)
+  totalAvaliacoesCliente   Int           @default(1)
+  totalServicosConcluidos  Int           @default(0)
+  competencias             Competencia[]
+
+  // Nomes de relação alinhados aos "include" usados nos repositórios.
+  demandasCriadas          Demanda[]     @relation("Contratante")
+  demandasPrestadas        Demanda[]     @relation("Prestador")
+  orcamentos               Orcamento[]
+}
+
+// Habilidade cadastrada livremente pelo usuário em seu perfil.
+model Competencia {
+  id        Int     @id @default(autoincrement())
+  usuarioId String
+  nome      String
+  // Cascade: ao excluir o usuário, suas competências são removidas junto.
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, nome])
+}
+
+// Categoria de serviço (ex: Tecnologia, Design), usada para classificar demandas.
+model Categoria {
+  id          Int          @id @default(autoincrement())
+  nome        String       @unique
+  habilidades Habilidade[]
+  demandas    Demanda[]
+}
+
+// Habilidade pré-cadastrada vinculada a uma categoria (catálogo do sistema).
+model Habilidade {
+  id          Int       @id @default(autoincrement())
+  nome        String
+  categoriaId Int
+  categoria   Categoria @relation(fields: [categoriaId], references: [id], onDelete: Cascade)
+
+  @@unique([categoriaId, nome])
+}
+
+// Serviço solicitado por um contratante, com seu ciclo de vida completo
+// (aberta, negociação, aprovada, concluída, desabilitada, excluída).
+model Demanda {
+  id                     String      @id
+  titulo                 String
+  descricao              String
+  valorEstimado          Float?
+  // Opcional: começa nulo/indefinido até a demanda ser aprovada com um orçamento.
+  valorFinalAcordado     Float?
+  status                 String      @default("ABERTA")
+  categoriaId            Int
+  habilidadesExtras      String      @default("")
+  prazoFinalizacao       DateTime
+  nivelMinimoExigido     String      @default("INICIANTE")
+  reputacaoMinimaExigida Float       @default(0)
+
+  dataCriacao            DateTime    @default(now())
+  dataUltimaAtualizacao  DateTime    @default(now())
+
+  dataAprovacao          DateTime?
+  dataEntregaPrestador   DateTime?
+  prestadorConcluiuEm    DateTime?
+  clienteAvaliouEm       DateTime?
+
+  notaPrestadorParaCliente Float?
+  notaClienteParaPrestador Float?
+
+  contratanteId          String
+  prestadorEscolhidoId   String?
+
+  categoria              Categoria   @relation(fields: [categoriaId], references: [id])
+  contratante            Usuario     @relation("Contratante", fields: [contratanteId], references: [id])
+  prestadorEscolhido     Usuario?    @relation("Prestador", fields: [prestadorEscolhidoId], references: [id])
+  orcamentos             Orcamento[]
+}
+
+// Proposta de valor de um prestador para uma demanda, com histórico de
+// negociação (contrapropostas) entre prestador e cliente.
+model Orcamento {
+  id                String   @id @default(cuid())
+  demandaId         String
+  prestadorId       String
+  valorProposto     Float
+  mensagem          String?
+  status            String   @default("PENDENTE")
+  ultimaPropostaPor String   @default("PRESTADOR")
+  dataCriacao       DateTime @default(now())
+  dataAtualizacao   DateTime @updatedAt
+
+  // Cascade: evita erro ao excluir uma demanda que já tenha orçamentos vinculados.
+  demanda           Demanda  @relation(fields: [demandaId], references: [id], onDelete: Cascade)
+  prestador         Usuario  @relation(fields: [prestadorId], references: [id], onDelete: Cascade)
+
+  @@unique([demandaId, prestadorId])
+}
